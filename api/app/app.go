@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	handler "spender/v1/api/app/handler"
+	handler "spender/v1/api/app/controller"
 	models "spender/v1/api/app/models"
 	config "spender/v1/api/config"
 

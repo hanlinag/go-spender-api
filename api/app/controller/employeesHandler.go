@@ -1,14 +1,13 @@
-package handler
+package controller
 
 import (
 	"encoding/json"
 	"net/http"
-	model "spender/v1/api/app/models"
-
-	//"go-spender-api/api/app/models"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
+
+	model "spender/v1/api/app/models"
 )
 
 func GetAllEmployees(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
