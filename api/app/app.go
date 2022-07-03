@@ -62,6 +62,7 @@ func (a *App) setRouters() {
 	//user auth
 	a.Post("/v1/auth/login", a.AuthLogin)
 	a.Post("/v1/auth/signup", a.AuthSignUp)
+	a.Post("/v1/auth/logout", a.Logout)
 
 	//transactions
 	a.Get("/v1/transactions", a.GetAllTransactions)
@@ -99,6 +100,10 @@ func (a *App) AuthLogin(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) AuthSignUp(w http.ResponseWriter, r *http.Request) {
 	controller.SignUp(a.DB, w, r)
+}
+
+func (a *App) Logout(w http.ResponseWriter, r *http.Request) {
+	controller.Logout(a.DB, w, r)
 }
 
 //-------------------------------------------

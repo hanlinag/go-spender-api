@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/dgrijalva/jwt-go"
 
@@ -32,7 +31,9 @@ func GenerateJwtToken(payload Payload) (string, error) {
 
 	key := []byte(JWT_SECRET)
 
-	expirationTime := time.Now().Add(7 * 24 * 60 * time.Minute)
+	//7 * 24 * 60 : 7 days 
+	//in mins
+	expirationTime := config.TokenExpiredTime
 
 	claims := &Claims{
 		Id:       payload.Id,
@@ -70,6 +71,7 @@ func VerifyJwtToken(strToken string) (*Claims, error) {
 		if err == jwt.ErrSignatureInvalid {
 			return claims, fmt.Errorf("invalid token signature")
 		}
+		
 	}
 
 	if token == nil {

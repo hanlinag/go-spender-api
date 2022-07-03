@@ -42,7 +42,7 @@ func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		}
 		user.Token = token
 	} else {
-		respondError(w, http.StatusUnauthorized, err.Error())
+		respondError(w, http.StatusUnauthorized, "Unauthorized")
 		return 
 	}
 	
@@ -69,6 +69,10 @@ func SignUp(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusCreated, user)
 }
 
+func Logout(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
+	//clear token
+	respondJSON(w, http.StatusOK, "Successly logged out")
+}
 
 // getEmployeeOr404 gets a employee instance if exists, or respond the 404 error otherwise
 func getUserOr404(db *gorm.DB, email string, w http.ResponseWriter, r *http.Request) *model.User {

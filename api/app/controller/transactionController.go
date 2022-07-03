@@ -83,11 +83,11 @@ func DeleteTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 }
 
 // getEmployeeOr404 gets a employee instance if exists, or respond the 404 error otherwise
-func getTransactionOr404(db *gorm.DB, name string, w http.ResponseWriter, r *http.Request) *model.Employee {
-	employee := model.Employee{}
-	if err := db.First(&employee, model.Employee{Name: name}).Error; err != nil {
+func getTransactionOr404(db *gorm.DB, name string, w http.ResponseWriter, r *http.Request) *model.Transaction {
+	transaction := model.Transaction{}
+	if err := db.First(&transaction, model.Employee{Name: name}).Error; err != nil {
 		respondError(w, http.StatusNotFound, err.Error())
 		return nil
 	}
-	return &employee
+	return &transaction
 }
