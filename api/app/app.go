@@ -10,7 +10,8 @@ import (
 	config "spender/v1/api/config"
 
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/postgres"
+  	"gorm.io/gorm"
 )
 
 // App has router and db instances
@@ -21,16 +22,21 @@ type App struct {
 
 // App initialize with predefined configuration
 func (a *App) Initialize(config *config.Config) {
-	dbURI := fmt.Sprintf("%s%s@%s/%s?charset=%s&parseTime=True",
+	dbURI := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable Timezone=Asia/Rangoon",
+		config.DB.Host,
 		config.DB.Username,
 		config.DB.Password,
-		config.DB.Host,
 		config.DB.Name,
-		config.DB.Charset)
+		config.DB.Port)
 
 	fmt.Println(dbURI)
 
-	db, err := gorm.Open(config.DB.Dialect, dbURI)
+	//db, err := gorm.Open(config.DB.Dialect, dbURI)
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN: dbURI, // data source name, refer https://github.com/jackc/pgx
+		PreferSimpleProtocol: true, // disables implicit prepared statement usage. By default pgx automatically uses the extended protocol
+	  }), &gorm.Config{})
+
 	if err != nil {
 		log.Fatal("Could not connect database")
 	}

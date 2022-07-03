@@ -8,7 +8,7 @@ import (
 	//"go-spender-api/api/app/models"
 
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 func GetAllEmployees(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
