@@ -2,8 +2,10 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 
@@ -11,33 +13,40 @@ import (
 )
 
 func GetAllTransactions(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
-	employees := []model.Transaction{}
-	db.Find(&employees, "userId = ?", r.Header.Get("UserId"))
-	respondJSON(w, http.StatusOK, employees)
+	transactions := []model.Transaction{}
+	db.Where("user_id = ?", r.Header.Get("user_id")).Find(&transactions)
+	fmt.Println(transactions)
+	respondJSON(w, http.StatusOK, transactions)
 }
 
 func CreateTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
-	employee := model.Employee{}
+	transaction := model.Transaction{}
 
+	userId := r.Header.Get("user_id")
+
+	
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&employee); err != nil {
+	if err := decoder.Decode(&transaction); err != nil {
 		respondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	defer r.Body.Close()
 
-	if err := db.Save(&employee).Error; err != nil {
+	transaction.UserId = userId
+	transaction.Uuid = uuid.New().String()
+
+	if err := db.Save(&transaction).Error; err != nil {
 		respondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondJSON(w, http.StatusCreated, employee)
+	respondJSON(w, http.StatusCreated, transaction)
 }
 
 func GetTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	name := vars["name"]
-	employee := getEmployeeOr404(db, name, w, r)
+	name := vars["user_id"]
+	employee := getTransactionOr404(db, name, w, r)
 	if employee == nil {
 		return
 	}
