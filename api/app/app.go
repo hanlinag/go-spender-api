@@ -11,7 +11,7 @@ import (
 
 	controller "spender/v1/api/app/controller"
 	models "spender/v1/api/app/models"
-	config "spender/v1/api/config"
+	configs "spender/v1/api/config"
 	auth "spender/v1/api/app/auth"
 
 )
@@ -23,7 +23,7 @@ type App struct {
 }
 
 // App initialize with predefined configuration
-func (a *App) Initialize(config *config.Config) {
+func (a *App) Initialize(config *configs.Config) {
 	dbURI := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable Timezone=Asia/Rangoon",
 		config.DB.Host,
 		config.DB.Username,
@@ -35,7 +35,7 @@ func (a *App) Initialize(config *config.Config) {
 
 	//db, err := gorm.Open(config.DB.Dialect, dbURI)
 	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN: dbURI, // data source name, refer https://github.com/jackc/pgx
+		DSN: configs.DBURL, 
 		PreferSimpleProtocol: true, // disables implicit prepared statement usage. By default pgx automatically uses the extended protocol
 	  }), &gorm.Config{})
 
