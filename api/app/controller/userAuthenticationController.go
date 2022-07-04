@@ -7,6 +7,7 @@ import (
 
 	//"github.com/gorilla/mux"
 	"gorm.io/gorm"
+	"github.com/google/uuid"
 
 	model "spender/v1/api/app/models"
 	utils "spender/v1/api/app/utils"
@@ -30,7 +31,7 @@ func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	//find user first
-	user := getUserOr404(db, login.Email, w, r)
+	user := GetUserOr404(db, login.Email, w, r)
 	if user == nil {
 		return
 	}
@@ -86,6 +87,12 @@ func SignUp(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
+	user.IsActive	 = false
+	user.IsLogin	 = false
+	user.IsVerified  = false
+	
+	user.Uuid = uuid.New().String()
+
 	if err := db.Save(&user).Error; err != nil {
 		respondError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -99,9 +106,18 @@ func Logout(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 }
 
 // getEmployeeOr404 gets a employee instance if exists, or respond the 404 error otherwise
-func getUserOr404(db *gorm.DB, email string, w http.ResponseWriter, r *http.Request) *model.User {
+func GetUserOr404(db *gorm.DB, email string, w http.ResponseWriter, r *http.Request) *model.User {
 	user := model.User{}
 	if err := db.First(&user, model.User{Email: email}).Error; err != nil {
+		respondError(w, http.StatusNotFound, "There is no such user in our system. Please check your credentials and try again.")
+		return nil
+	}
+	return &user
+}
+
+func GetUserByUUIDOr404(db *gorm.DB, uuid string, w http.ResponseWriter, r *http.Request) *model.User {
+	user := model.User{}
+	if err := db.First(&user, model.User{Uuid: uuid}).Error; err != nil {
 		respondError(w, http.StatusNotFound, "There is no such user in our system. Please check your credentials and try again.")
 		return nil
 	}
