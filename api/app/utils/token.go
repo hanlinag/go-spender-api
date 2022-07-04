@@ -85,3 +85,18 @@ func VerifyJwtToken(strToken string) (*Claims, error) {
 
 	return claims, nil
 }
+
+func ExpireJwtToken(strToken string) (*Claims, error) {
+	// JWT_SECRET = config.JWT_SECRET
+
+	// key := []byte(JWT_SECRET)
+
+	// claims := &Claims{}
+
+	// token, err := jwt.ParseWithClaims(strToken, claims, func(token *jwt.Token) (interface{}, error) {
+	// 	return key, nil
+	// })
+	
+	return nil, nil
+
+}

@@ -32,8 +32,6 @@ func CheckAuth(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		}
-		
-		
 		next.ServeHTTP(w, r)
 	})
 }

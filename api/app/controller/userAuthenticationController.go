@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	//"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -14,6 +15,12 @@ import (
 func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	login := model.Login{}
 
+	os := r.Header.Get("os")
+	osVersion := r.Header.Get("os_version")
+	deviceId := r.Header.Get("device_id")
+	deviceModel := r.Header.Get("device_model")
+	appId := r.Header.Get("app_id")
+	appVersion := r.Header.Get("app_version")
 	
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&login); err != nil {
@@ -41,6 +48,23 @@ func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		user.Token = token
+
+		//set last login time and status
+		user.SetLogin(true)
+		user.LastLogin = time.Now()
+		user.DeviceId = deviceId
+		user.DeviceModel = deviceModel
+		user.OS = os
+		user.OSVersion  = osVersion
+		user.AppId = appId
+		user.AppVersion = appVersion
+
+		//update user data in the db
+		if err := db.Save(&user).Error; err != nil {
+			respondError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		
 	} else {
 		respondError(w, http.StatusUnauthorized, "Unauthorized")
 		return 
