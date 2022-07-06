@@ -1,1 +1,1 @@
-web: bin/go-spender-api
+web: go-spender-api
