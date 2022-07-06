@@ -36,7 +36,7 @@ func (a *App) Initialize(config *configs.Config) {
 	//db, err := gorm.Open(config.DB.Dialect, dbURI)
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN: configs.DBURL , //staging
-		//DSN: dbURI, //local
+		//cDSN: dbURI, //local
 		PreferSimpleProtocol: true, // disables implicit prepared statement usage. By default pgx automatically uses the extended protocol
 	  }), &gorm.Config{})
 
