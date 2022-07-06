@@ -1,1 +1,1 @@
-web: go-spender-api
+web: go run main.go
