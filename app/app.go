@@ -9,10 +9,10 @@ import (
 	"gorm.io/driver/postgres"
   	"gorm.io/gorm"
 
-	controller "spender/v1/api/app/controller"
-	models "spender/v1/api/app/models"
-	configs "spender/v1/api/config"
-	auth "spender/v1/api/app/auth"
+	controller "spender/v1/app/controller"
+	models "spender/v1/app/models"
+	configs "spender/v1/config"
+	auth "spender/v1/app/auth"
 
 )
 
@@ -35,8 +35,8 @@ func (a *App) Initialize(config *configs.Config) {
 
 	//db, err := gorm.Open(config.DB.Dialect, dbURI)
 	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN: configs.DBURL , //staging
-		//DSN: dbURI, //local
+		//DSN: configs.DBURL , //staging
+		DSN: dbURI, //local
 		PreferSimpleProtocol: true, // disables implicit prepared statement usage. By default pgx automatically uses the extended protocol
 	  }), &gorm.Config{})
 

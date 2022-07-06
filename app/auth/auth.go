@@ -6,8 +6,8 @@ import (
 
 	"gorm.io/gorm"
 
-	controller "spender/v1/api/app/controller"
-	utils "spender/v1/api/app/utils"
+	controller "spender/v1/app/controller"
+	utils "spender/v1/app/utils"
 
 )
 
