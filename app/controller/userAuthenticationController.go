@@ -9,8 +9,8 @@ import (
 	"gorm.io/gorm"
 	"github.com/google/uuid"
 
-	model "spender/v1/api/app/models"
-	utils "spender/v1/api/app/utils"
+	model "spender/v1/app/models"
+	utils "spender/v1/app/utils"
 )
 
 func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {

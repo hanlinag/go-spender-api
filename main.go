@@ -1,8 +1,8 @@
 package main
 
 import (
-	app "spender/v1/api/app"
-	config "spender/v1/api/config"
+	app "spender/v1/app"
+	config "spender/v1/config"
 )
 
 func main() {

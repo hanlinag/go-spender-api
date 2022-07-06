@@ -5,7 +5,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	config "spender/v1/api/config"
+	config "spender/v1/config"
 )
 
 type Payload struct {

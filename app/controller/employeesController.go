@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 
-	model "spender/v1/api/app/models"
+	model "spender/v1/app/models"
 )
 
 func GetAllEmployees(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
