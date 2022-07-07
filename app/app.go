@@ -24,7 +24,7 @@ type App struct {
 
 // App initialize with predefined configuration
 func (a *App) Initialize(config *configs.Config) {
-	dbURI := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable Timezone=Asia/Rangoon",
+	dbURI := fmt.Sprintf("DB From Local Config:::: host=%s user=%s password=%s dbname=%s port=%s sslmode=disable Timezone=Asia/Rangoon",
 		config.DB.Host,
 		config.DB.Username,
 		config.DB.Password,
