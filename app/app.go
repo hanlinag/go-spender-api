@@ -53,22 +53,22 @@ func (a *App) Initialize(config *configs.Config) {
 // Set all required routers
 func (a *App) setRouters() {
 	// Routing for handling the projects
-	a.Get("/v1/employees", a.GetAllEmployees)
-	a.Post("/v1/employees", a.CreateEmployee)
-	a.Get("/employees/{title}", a.GetEmployee)
-	a.Put("/employees/{title}", a.UpdateEmployee)
-	a.Delete("/employees/{title}", a.DeleteEmployee)
-	a.Put("/employees/{title}/disable", a.DisableEmployee)
-	a.Put("/employees/{title}/enable", a.EnableEmployee)
+	a.Get("/api/v1/employees", a.GetAllEmployees)
+	a.Post("/api/v1/employees", a.CreateEmployee)
+	a.Get("/api/employees/{title}", a.GetEmployee)
+	a.Put("/api/employees/{title}", a.UpdateEmployee)
+	a.Delete("/api/employees/{title}", a.DeleteEmployee)
+	a.Put("/api/employees/{title}/disable", a.DisableEmployee)
+	a.Put("/api/employees/{title}/enable", a.EnableEmployee)
 
 	//user auth
-	a.Post("/v1/auth/login", a.AuthLogin)
-	a.Post("/v1/auth/signup", a.AuthSignUp)
-	a.Post("/v1/auth/logout", a.Logout)
+	a.Post("/api/v1/auth/login", a.AuthLogin)
+	a.Post("/api/v1/auth/signup", a.AuthSignUp)
+	a.Post("/api/v1/auth/logout", a.Logout)
 
 	//transactions
-	a.Get("/v1/transactions", a.GetAllTransactions)
-	a.Post("/v1/transaction", a.CreateTransaction)
+	a.Get("/api/v1/transactions", a.GetAllTransactions)
+	a.Post("/api/v1/transaction", a.CreateTransaction)
 }
 
 // Wrap the router for GET method
