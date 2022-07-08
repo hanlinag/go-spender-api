@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"html/template"
 
 	"github.com/gorilla/mux"
 	"gorm.io/driver/postgres"
@@ -24,7 +25,7 @@ type App struct {
 
 // App initialize with predefined configuration
 func (a *App) Initialize(config *configs.Config) {
-	dbURI := fmt.Sprintf("DB From Local Config:::: host=%s user=%s password=%s dbname=%s port=%s sslmode=disable Timezone=Asia/Rangoon",
+	dbURI := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable Timezone=Asia/Rangoon",
 		config.DB.Host,
 		config.DB.Username,
 		config.DB.Password,
@@ -35,8 +36,8 @@ func (a *App) Initialize(config *configs.Config) {
 
 	//db, err := gorm.Open(config.DB.Dialect, dbURI)
 	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN: configs.DBURL , //staging
-		//cDSN: dbURI, //local
+		//DSN: configs.DBURL , //staging
+		DSN: dbURI, //local
 		PreferSimpleProtocol: true, // disables implicit prepared statement usage. By default pgx automatically uses the extended protocol
 	  }), &gorm.Config{})
 
@@ -152,6 +153,27 @@ func (a *App) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 
 //------------------------------------------------
 // Run the app on it's router
+
+//home page
+var tpl = template.Must(template.ParseFiles("index.html"))
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	tpl.Execute(w, nil)
+}
+
+
+
 func (a *App) Run(host string) {
+	//Home Page
+	//fs := http.FileServer(http.Dir("assets"))
+	//a.Router.Handle("/assets/", http.StripPrefix("/assets/", fs))
+	//a.Router.Handle("/assets/", http.FileServer(http.FS(contentStatic)))
+	//a.Router.HandleFunc("/assets/", serveAssets)
+	a.Router.HandleFunc("/", indexHandler)
+	
 	log.Fatal(http.ListenAndServe(host, a.Router))
 }
+
+
+
+
