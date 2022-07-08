@@ -11,7 +11,7 @@ func main() {
 	config := config.GetConfig()
 
 	port := os.Getenv("PORT") //heroku
-	port = "3000"//local
+	//port = "3000"//local
 
 	app := &app.App{}
 	app.Initialize(config)
