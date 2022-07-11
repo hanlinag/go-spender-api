@@ -25,19 +25,26 @@ type App struct {
 
 // App initialize with predefined configuration
 func (a *App) Initialize(config *configs.Config) {
-	dbURI := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable Timezone=Asia/Rangoon",
+
+
+	var dbURI = ""
+
+	if configs.ISLOCAL {
+		dbURI = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable Timezone=Asia/Rangoon",
 		config.DB.Host,
 		config.DB.Username,
 		config.DB.Password,
 		config.DB.Name,
 		config.DB.Port)
+	} else {
+		dbURI = configs.DBURL
+	}
 
 	fmt.Println(dbURI)
 
 	//db, err := gorm.Open(config.DB.Dialect, dbURI)
 	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN: configs.DBURL , //staging
-		//DSN: dbURI, //local
+		DSN: dbURI, 
 		PreferSimpleProtocol: true, // disables implicit prepared statement usage. By default pgx automatically uses the extended protocol
 	  }), &gorm.Config{})
 
@@ -52,14 +59,14 @@ func (a *App) Initialize(config *configs.Config) {
 
 // Set all required routers
 func (a *App) setRouters() {
-	// Routing for handling the projects
+	// Routing for handling the projec
 	a.Get("/api/v1/employees", a.GetAllEmployees)
 	a.Post("/api/v1/employees", a.CreateEmployee)
-	a.Get("/api/employees/{title}", a.GetEmployee)
-	a.Put("/api/employees/{title}", a.UpdateEmployee)
-	a.Delete("/api/employees/{title}", a.DeleteEmployee)
-	a.Put("/api/employees/{title}/disable", a.DisableEmployee)
-	a.Put("/api/employees/{title}/enable", a.EnableEmployee)
+	a.Get("/api/v1/employees/{title}", a.GetEmployee)
+	a.Put("/api/v1/employees/{title}", a.UpdateEmployee)
+	a.Delete("/api/v1/employees/{title}", a.DeleteEmployee)
+	a.Put("/api/v1/employees/{title}/disable", a.DisableEmployee)
+	a.Put("/api/v1/employees/{title}/enable", a.EnableEmployee)
 
 	//user auth
 	a.Post("/api/v1/auth/login", a.AuthLogin)

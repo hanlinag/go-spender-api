@@ -4,14 +4,19 @@ import (
 	"os"
 
 	app "spender/v1/app"
-	config "spender/v1/config"
+	configs "spender/v1/config"
 )
 
 func main() {
-	config := config.GetConfig()
+	config := configs.GetConfig()
 
-	port := os.Getenv("PORT") //heroku
-	//port = "3000"//local
+	var port = ""
+
+	if configs.ISLOCAL {
+		port = "3000"
+	} else {
+		port = os.Getenv("PORT")
+	}
 
 	app := &app.App{}
 	app.Initialize(config)

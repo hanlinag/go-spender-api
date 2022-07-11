@@ -102,7 +102,7 @@ func SignUp(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 
 func Logout(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	//clear token
-	respondJSON(w, http.StatusOK, "Successly logged out")
+	respondJSON(w, http.StatusOK, "Successfully logged out")
 }
 
 // getEmployeeOr404 gets a employee instance if exists, or respond the 404 error otherwise

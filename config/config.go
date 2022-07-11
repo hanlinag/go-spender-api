@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+var ISLOCAL = true
+
 type Config struct {
 	DB *DBConfig
 }
