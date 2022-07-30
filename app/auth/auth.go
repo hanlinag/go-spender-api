@@ -8,60 +8,76 @@ import (
 
 	controller "spender/v1/app/controller"
 	utils "spender/v1/app/utils"
-
 )
 
 var error = utils.CustomError{}
 
 func CheckAuth(db *gorm.DB, next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path
-	if path != "/api/v1/auth/signup" && path != "/api/v1/auth/login" && path != "/api/v1/app-config" {
-		
-		//required auth
-		authHeader := r.Header.Get("Authorization")
-		bearerToken := strings.Split(authHeader, " ")
+		path := r.URL.Path
+		if path != "/api/v1/auth/signup" && path != "/api/v1/auth/login" && path != "/api/v1/app-config" {
 
-		if len(bearerToken) < 2 {
-			error.ApiError(w, http.StatusForbidden, "Token not provided!")
-			return
-		}
+			//required auth
+			authHeader := r.Header.Get("Authorization")
+			bearerToken := strings.Split(authHeader, " ")
 
-		token := bearerToken[1]
+			if len(bearerToken) < 2 {
+				error.ApiError(w, http.StatusForbidden, "Token not provided!")
+				return
+			}
 
-		_, err := utils.VerifyJwtToken(token)
-		if err != nil {
-			error.ApiError(w, http.StatusForbidden, err.Error())
-			return
-		}
+			token := bearerToken[1]
 
-		//get data in header and save to user's table
-		os := r.Header.Get("os")
-		osVersion := r.Header.Get("os_version")
-		deviceId := r.Header.Get("device_id")
-		deviceModel := r.Header.Get("device_model")
-		appId := r.Header.Get("app_id")
-		appVersion := r.Header.Get("app_version")
-		userId := r.Header.Get("user_id")
+			_, err := utils.VerifyJwtToken(token)
+			if err != nil {
+				error.ApiError(w, http.StatusForbidden, err.Error())
+				return
+			}
 
+			//get data in header and save to user's table
+			os := r.Header.Get("os")
+			osVersion := r.Header.Get("os_version")
+			deviceId := r.Header.Get("device_id")
+			deviceModel := r.Header.Get("device_model")
+			appId := r.Header.Get("app_id")
+			appVersion := r.Header.Get("app_version")
+			userId := r.Header.Get("user_id")
 
-		//find user first
-		user := controller.GetUserByUUIDOr404(db, userId, w)
-		if user == nil {
-			return
-		}
-		user.DeviceId = deviceId
-		user.DeviceModel = deviceModel
-		user.OS = os
-		user.OSVersion  = osVersion
-		user.AppId = appId
-		user.AppVersion = appVersion
+			//find user first
+			user := controller.GetUserByUUIDOr404(db, userId, w)
+			if user == nil {
+				return
+			}
 
-		//update user data in the db
-		if err := db.Save(&user).Error; err != nil {
-		//respondError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
+			if deviceId != "" {
+				user.DeviceId = deviceId
+			}
+
+			if deviceModel != "" {
+				user.DeviceModel = deviceModel
+			}
+
+			if os != "" {
+				user.OS = os
+			}
+
+			if osVersion != "" {
+				user.OSVersion = osVersion
+			}
+
+			if appId != "" {
+				user.AppId = appId
+			}
+
+			if appVersion != "" {
+				user.AppVersion = appVersion
+			}
+
+			//update user data in the db
+			if err := db.Save(&user).Error; err != nil {
+				//respondError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
 
 		}
 		next.ServeHTTP(w, r)
