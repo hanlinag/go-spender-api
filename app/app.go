@@ -81,6 +81,13 @@ func (a *App) setRouters() {
 	a.Get("/api/v1/transaction/{uuid}", a.GetSingleTransaction)
 	a.Post("/api/v1/transaction/{uuid}", a.UpdateTransaction)
 	a.Delete("/api/v1/transaction/{uuid}", a.DeleteTransaction)
+
+	//wallet
+	a.Get("/api/v1/wallets", a.GetAllWallets)
+	a.Post("/api/v1/wallet", a.CreateWallet)
+	a.Get("/api/v1/wallet/{uuid}", a.GetSingleWallet)
+	a.Post("/api/v1/wallet/{uuid}", a.UpdateWallet)
+	a.Delete("/api/v1/wallet/{uuid}", a.DeleteWallet)
 }
 
 // Wrap the router for GET method
@@ -181,6 +188,28 @@ func (a *App) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 	controller.DeleteTransaction(a.DB, w, r)
+}
+
+//--------------------------------------------------
+//Wallets
+func (a *App) GetAllWallets(w http.ResponseWriter, r *http.Request) {
+	controller.GetAllWallets(a.DB, w, r)
+}
+
+func (a *App) CreateWallet(w http.ResponseWriter, r *http.Request) {
+	controller.CreateWallet(a.DB, w, r)
+}
+
+func (a *App) GetSingleWallet(w http.ResponseWriter, r *http.Request) {
+	controller.GetWallet(a.DB, w, r)
+}
+
+func (a *App) UpdateWallet(w http.ResponseWriter, r *http.Request) {
+	controller.UpdateWallet(a.DB, w, r)
+}
+
+func (a *App) DeleteWallet(w http.ResponseWriter, r *http.Request) {
+	controller.DeleteWallet(a.DB, w, r)
 }
 
 //------------------------------------------------

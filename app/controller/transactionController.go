@@ -16,20 +16,19 @@ import (
 func GetAllTransactions(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	transactions := []model.Transaction{}
 
+	
 	//get queries 
 	walletID 		:= r.URL.Query().Get("wallet_id")
 	category 		:= r.URL.Query().Get("category")
 	transactionType := r.URL.Query().Get("type")
 	limitt 			:= r.URL.Query().Get("limit")
-	//cursor 			:= r.URL.Query().Get("cursor")
+	cursor 			:= r.URL.Query().Get("cursor")
 
-	// timee, error := time.Parse(time.RFC3339, cursor)
+	
+	//2021-01-01 00:00:00
+	//Format("2006-01-02 15:04:05")
 
-	// if error !=  nil {
-		
-	// }
-
-	limit := 2
+	limit := 1 //DEFAULT LIMIT 10
 	if limitt != "" {
 		x, err := strconv.ParseInt(limitt, 10, 32)
 
@@ -38,8 +37,14 @@ func GetAllTransactions(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		}
 		limit = int(x)
 	}
+	if cursor != "" {
+		
+		db.Where("date < ?", cursor).Where(&model.Transaction{UserId: r.Header.Get("user_id"), Type: transactionType, WalletId: walletID, Category: category}).Order("updated_at desc").Limit(limit).Find(&transactions)
+	} else {
+		db.Where(&model.Transaction{UserId: r.Header.Get("user_id"), Type: transactionType, WalletId: walletID, Category: category}).Order("updated_at desc").Limit(limit).Find(&transactions)
+	}
 
-	db.Where("updated_at < ?", "2020-01-01 00:00:00").Where(&model.Transaction{UserId: r.Header.Get("user_id"), Type: transactionType, WalletId: walletID, Category: category}).Order("updated_at desc").Limit(limit).Find(&transactions)
+	
 	//db.Where("user_id = ? AND type = ? AND wallet_id = ? AND category = ?", r.Header.Get("user_id"), transactionType, walletID, category).Limit(limit).Find(&transactions)
 	//db.Where("user_id = ?", r.Header.Get("user_id")).Find(&transactions)
 	//fmt.Println(transactions)
