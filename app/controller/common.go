@@ -90,7 +90,7 @@ func commonRespondJSON(w http.ResponseWriter, status int, payload interface{}) {
 func respondJSONWithFormat(w http.ResponseWriter, code int, data interface{}, error interface{}, customCode int, desc string) {
 
 	response := &models.GeneralResponse{}
-	response.Timestamp = time.Now().Local().String()
+	response.Timestamp = time.Now().UTC().String()
 	response.Desc = desc
 	response.StatusCode = customCode
 

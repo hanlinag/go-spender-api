@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -14,12 +15,38 @@ import (
 
 func GetAllTransactions(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	transactions := []model.Transaction{}
-	db.Where("user_id = ?", r.Header.Get("user_id")).Find(&transactions)
+
+	//get queries 
+	walletID 		:= r.URL.Query().Get("wallet_id")
+	category 		:= r.URL.Query().Get("category")
+	transactionType := r.URL.Query().Get("type")
+	limitt 			:= r.URL.Query().Get("limit")
+	//cursor 			:= r.URL.Query().Get("cursor")
+
+	// timee, error := time.Parse(time.RFC3339, cursor)
+
+	// if error !=  nil {
+		
+	// }
+
+	limit := 2
+	if limitt != "" {
+		x, err := strconv.ParseInt(limitt, 10, 32)
+
+		if err != nil {
+		//	limit = int(x)
+		}
+		limit = int(x)
+	}
+
+	db.Where("updated_at < ?", "2020-01-01 00:00:00").Where(&model.Transaction{UserId: r.Header.Get("user_id"), Type: transactionType, WalletId: walletID, Category: category}).Order("updated_at desc").Limit(limit).Find(&transactions)
+	//db.Where("user_id = ? AND type = ? AND wallet_id = ? AND category = ?", r.Header.Get("user_id"), transactionType, walletID, category).Limit(limit).Find(&transactions)
+	//db.Where("user_id = ?", r.Header.Get("user_id")).Find(&transactions)
 	//fmt.Println(transactions)
 	//to do pagiation
 	msg := "Transactions data found"
 	if len(transactions) == 0 {
-		msg = "No transaciton record for this user yet."
+		msg = "No transaciton for this user yet."
 	}
 	//msg = ("len %d", len(transatransactions) )
 	respondJSONWithFormat(w, http.StatusOK, transactions, nil, 200, msg)
