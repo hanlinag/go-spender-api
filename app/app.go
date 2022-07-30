@@ -68,6 +68,10 @@ func (a *App) setRouters() {
 	a.Put("/api/v1/employees/{title}/disable", a.DisableEmployee)
 	a.Put("/api/v1/employees/{title}/enable", a.EnableEmployee)
 
+	//app config
+	a.Get("/api/v1/app-config", a.GetAppConfig)
+	a.Post("/api/v1/app-config", a.UpdateAppConfig)
+
 	//user auth
 	a.Post("/api/v1/auth/login", a.AuthLogin)
 	a.Post("/api/v1/auth/signup", a.AuthSignUp)
@@ -102,6 +106,16 @@ func (a *App) Delete(path string, f func(w http.ResponseWriter, r *http.Request)
 	a.Router.HandleFunc(path, auth.CheckAuth(a.DB, f)).Methods("DELETE")
 }
 
+//----------------------------------------
+//App Config
+func (a *App) GetAppConfig(w http.ResponseWriter, r *http.Request) {
+	controller.GetAppConfig(a.DB, w)
+}
+
+
+func (a *App) UpdateAppConfig(w http.ResponseWriter, r *http.Request) {
+	controller.UpdateAppConfig(a.DB, w, r)
+}
 //--------------------------------------------
 //Auth Login
 func (a *App) AuthLogin(w http.ResponseWriter, r *http.Request) {
