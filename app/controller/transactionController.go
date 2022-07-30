@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -14,12 +15,40 @@ import (
 
 func GetAllTransactions(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	transactions := []model.Transaction{}
-	db.Where("user_id = ?", r.Header.Get("user_id")).Find(&transactions)
+
+	//get queries
+	walletID := r.URL.Query().Get("wallet_id")
+	category := r.URL.Query().Get("category")
+	transactionType := r.URL.Query().Get("type")
+	limitt := r.URL.Query().Get("limit")
+	cursor := r.URL.Query().Get("cursor")
+
+	//2021-01-01 00:00:00
+	//Format("2006-01-02 15:04:05")
+
+	limit := 1 //DEFAULT LIMIT 10
+	if limitt != "" {
+		x, err := strconv.ParseInt(limitt, 10, 32)
+
+		if err != nil {
+			//	limit = int(x)
+		}
+		limit = int(x)
+	}
+	if cursor != "" {
+
+		db.Where("date < ?", cursor).Where(&model.Transaction{UserId: r.Header.Get("user_id"), Type: transactionType, WalletId: walletID, Category: category}).Order("updated_at desc").Limit(limit).Find(&transactions)
+	} else {
+		db.Where(&model.Transaction{UserId: r.Header.Get("user_id"), Type: transactionType, WalletId: walletID, Category: category}).Order("updated_at desc").Limit(limit).Find(&transactions)
+	}
+
+	//db.Where("user_id = ? AND type = ? AND wallet_id = ? AND category = ?", r.Header.Get("user_id"), transactionType, walletID, category).Limit(limit).Find(&transactions)
+	//db.Where("user_id = ?", r.Header.Get("user_id")).Find(&transactions)
 	//fmt.Println(transactions)
 	//to do pagiation
 	msg := "Transactions data found"
 	if len(transactions) == 0 {
-		msg = "No transaciton record for this user yet."
+		msg = "No transaciton for this user yet."
 	}
 	//msg = ("len %d", len(transatransactions) )
 	respondJSONWithFormat(w, http.StatusOK, transactions, nil, 200, msg)
@@ -60,7 +89,7 @@ func GetTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	uuid := vars["uuid"]
-	transaction := getTransactionOr404(db, uuid, w, r)
+	transaction := getTransactionOr404(db, uuid, w)
 	if transaction == nil {
 		return
 	}
@@ -72,7 +101,7 @@ func UpdateTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	uuid := vars["uuid"]
-	transaction := getTransactionOr404(db, uuid, w, r)
+	transaction := getTransactionOr404(db, uuid, w)
 	if transaction == nil {
 		return
 	}
@@ -103,7 +132,7 @@ func DeleteTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	uuid := vars["uuid"]
-	transaction := getTransactionOr404(db, uuid, w, r)
+	transaction := getTransactionOr404(db, uuid, w)
 	if transaction == nil {
 		return
 	}
@@ -120,7 +149,7 @@ func DeleteTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 }
 
 // getEmployeeOr404 gets a employee instance if exists, or respond the 404 error otherwise
-func getTransactionOr404(db *gorm.DB, uuid string, w http.ResponseWriter, r *http.Request) *model.Transaction {
+func getTransactionOr404(db *gorm.DB, uuid string, w http.ResponseWriter) *model.Transaction {
 	transaction := model.Transaction{}
 	if err := db.First(&transaction, model.Transaction{Uuid: uuid}).Error; err != nil {
 		errMsg := &models.ErrorResponse{}
