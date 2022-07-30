@@ -88,6 +88,10 @@ func (a *App) setRouters() {
 	a.Get("/api/v1/wallet/{uuid}", a.GetSingleWallet)
 	a.Post("/api/v1/wallet/{uuid}", a.UpdateWallet)
 	a.Delete("/api/v1/wallet/{uuid}", a.DeleteWallet)
+
+	//Feedback
+	a.Get("/api/v1/feedbacks", a.GetAllFeedbacks)
+	a.Post("/api/v1/feedback", a.CreateFeedback)
 }
 
 // Wrap the router for GET method
@@ -210,6 +214,17 @@ func (a *App) UpdateWallet(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) DeleteWallet(w http.ResponseWriter, r *http.Request) {
 	controller.DeleteWallet(a.DB, w, r)
+}
+
+
+//--------------------------------------------------
+//Wallets
+func (a *App) GetAllFeedbacks(w http.ResponseWriter, r *http.Request) {
+	controller.GetAllFeedbacks(a.DB, w)
+}
+
+func (a *App) CreateFeedback(w http.ResponseWriter, r *http.Request) {
+	controller.CreateFeedback(a.DB, w, r)
 }
 
 //------------------------------------------------

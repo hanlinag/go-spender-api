@@ -16,15 +16,13 @@ import (
 func GetAllTransactions(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	transactions := []model.Transaction{}
 
-	
-	//get queries 
-	walletID 		:= r.URL.Query().Get("wallet_id")
-	category 		:= r.URL.Query().Get("category")
+	//get queries
+	walletID := r.URL.Query().Get("wallet_id")
+	category := r.URL.Query().Get("category")
 	transactionType := r.URL.Query().Get("type")
-	limitt 			:= r.URL.Query().Get("limit")
-	cursor 			:= r.URL.Query().Get("cursor")
+	limitt := r.URL.Query().Get("limit")
+	cursor := r.URL.Query().Get("cursor")
 
-	
 	//2021-01-01 00:00:00
 	//Format("2006-01-02 15:04:05")
 
@@ -33,18 +31,17 @@ func GetAllTransactions(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		x, err := strconv.ParseInt(limitt, 10, 32)
 
 		if err != nil {
-		//	limit = int(x)
+			//	limit = int(x)
 		}
 		limit = int(x)
 	}
 	if cursor != "" {
-		
+
 		db.Where("date < ?", cursor).Where(&model.Transaction{UserId: r.Header.Get("user_id"), Type: transactionType, WalletId: walletID, Category: category}).Order("updated_at desc").Limit(limit).Find(&transactions)
 	} else {
 		db.Where(&model.Transaction{UserId: r.Header.Get("user_id"), Type: transactionType, WalletId: walletID, Category: category}).Order("updated_at desc").Limit(limit).Find(&transactions)
 	}
 
-	
 	//db.Where("user_id = ? AND type = ? AND wallet_id = ? AND category = ?", r.Header.Get("user_id"), transactionType, walletID, category).Limit(limit).Find(&transactions)
 	//db.Where("user_id = ?", r.Header.Get("user_id")).Find(&transactions)
 	//fmt.Println(transactions)
@@ -135,7 +132,7 @@ func DeleteTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	uuid := vars["uuid"]
-	transaction := getTransactionOr404(db, uuid, w, )
+	transaction := getTransactionOr404(db, uuid, w)
 	if transaction == nil {
 		return
 	}

@@ -38,11 +38,11 @@ func UpdateAppConfig(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 
 	appConfig := model.AppConfig{}
 	if err := db.First(&appConfig, model.AppConfig{DataId: newAppConfig.DataId}).Error; err != nil {
-		//add new data 
+		//add new data
 		if err := db.Save(&newAppConfig).Error; err != nil {
 			errMsg := &models.ErrorResponse{}
 			errMsg.Message = err.Error()
-	
+
 			respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 500, "Error Saving App Config Data")
 			return
 		}
@@ -56,17 +56,14 @@ func UpdateAppConfig(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		if err := db.Save(&appConfig).Error; err != nil {
 			errMsg := &models.ErrorResponse{}
 			errMsg.Message = err.Error()
-	
+
 			respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 500, "Error Updating App Config Data")
 			return
 		}
 	}
 
-
 	respondJSONWithFormat(w, http.StatusOK, newAppConfig, nil, 200, "Data updated successfully.")
 }
-
-
 
 // respondJSON makes the response with payload as json format
 func commonRespondJSON(w http.ResponseWriter, status int, payload interface{}) {
