@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -39,7 +38,7 @@ func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	//find user first
-	user := GetUserOr404(db, login.Email, w, r)
+	user := GetUserOr404(db, login.Email, w)
 	if user == nil {
 		return
 	}
@@ -103,7 +102,7 @@ func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		user.AppId = appId
 		user.AppVersion = appVersion
 
-		fmt.Sprintf("Variable string %s content", user.OSVersion)
+		//fmt.Sprintf("Variable string %s content", user.OSVersion)
 
 		//update user data in the db
 		if err := db.Save(&user).Error; err != nil {
@@ -164,7 +163,7 @@ func Logout(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	userUUID := r.Header.Get("user_id")
 
 	//find user first
-	user := GetUserByUUIDOr404(db, userUUID, w, r)
+	user := GetUserByUUIDOr404(db, userUUID, w)
 	if user == nil {
 		return
 	}
@@ -172,10 +171,10 @@ func Logout(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	user.DeviceId = deviceId
 	user.IsLogin = false
 
-	UpdateUserDataAfterLogout(db, user, w, r)
+	UpdateUserDataAfterLogout(db, user, w)
 }
 
-func UpdateUserDataAfterLogout(db *gorm.DB, user *model.User, w http.ResponseWriter, r *http.Request) {
+func UpdateUserDataAfterLogout(db *gorm.DB, user *model.User, w http.ResponseWriter) {
 	response := &models.GeneralResponse{}
 	response.Timestamp = time.Now().Local().String()
 
@@ -198,7 +197,7 @@ func UpdateUser(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 
 	uuid := vars["uuid"]
 
-	user := GetUserByUUIDOr404(db, uuid, w, r)
+	user := GetUserByUUIDOr404(db, uuid, w)
 	if user == nil {
 		return
 	}
@@ -227,7 +226,7 @@ func UpdateUser(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 }
 
 // getEmployeeOr404 gets a employee instance if exists, or respond the 404 error otherwise
-func GetUserOr404(db *gorm.DB, email string, w http.ResponseWriter, r *http.Request) *model.User {
+func GetUserOr404(db *gorm.DB, email string, w http.ResponseWriter) *model.User {
 	user := model.User{}
 	if err := db.First(&user, model.User{Email: email}).Error; err != nil {
 
@@ -240,7 +239,7 @@ func GetUserOr404(db *gorm.DB, email string, w http.ResponseWriter, r *http.Requ
 	return &user
 }
 
-func GetUserByUUIDOr404(db *gorm.DB, uuid string, w http.ResponseWriter, r *http.Request) *model.User {
+func GetUserByUUIDOr404(db *gorm.DB, uuid string, w http.ResponseWriter) *model.User {
 	user := model.User{}
 	if err := db.First(&user, model.User{Uuid: uuid}).Error; err != nil {
 		errMsg := &models.ErrorResponse{}

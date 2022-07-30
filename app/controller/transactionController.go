@@ -60,7 +60,7 @@ func GetTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	uuid := vars["uuid"]
-	transaction := getTransactionOr404(db, uuid, w, r)
+	transaction := getTransactionOr404(db, uuid, w)
 	if transaction == nil {
 		return
 	}
@@ -72,7 +72,7 @@ func UpdateTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	uuid := vars["uuid"]
-	transaction := getTransactionOr404(db, uuid, w, r)
+	transaction := getTransactionOr404(db, uuid, w)
 	if transaction == nil {
 		return
 	}
@@ -103,7 +103,7 @@ func DeleteTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	uuid := vars["uuid"]
-	transaction := getTransactionOr404(db, uuid, w, r)
+	transaction := getTransactionOr404(db, uuid, w, )
 	if transaction == nil {
 		return
 	}
@@ -120,7 +120,7 @@ func DeleteTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 }
 
 // getEmployeeOr404 gets a employee instance if exists, or respond the 404 error otherwise
-func getTransactionOr404(db *gorm.DB, uuid string, w http.ResponseWriter, r *http.Request) *model.Transaction {
+func getTransactionOr404(db *gorm.DB, uuid string, w http.ResponseWriter) *model.Transaction {
 	transaction := model.Transaction{}
 	if err := db.First(&transaction, model.Transaction{Uuid: uuid}).Error; err != nil {
 		errMsg := &models.ErrorResponse{}
