@@ -16,7 +16,7 @@ var error = utils.CustomError{}
 func CheckAuth(db *gorm.DB, next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
-	if path != "/v1/auth/signup" && path != "/v1/auth/login" {
+	if path != "/api/v1/auth/signup" && path != "/api/v1/auth/login" {
 		
 		//required auth
 		authHeader := r.Header.Get("Authorization")
