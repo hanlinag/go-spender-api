@@ -17,7 +17,12 @@ func GetAllTransactions(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 	db.Where("user_id = ?", r.Header.Get("user_id")).Find(&transactions)
 	//fmt.Println(transactions)
 	//to do pagiation
-	respondJSONWithFormat(w, http.StatusOK, transactions, nil, 200, "Transactions data found.")
+	msg := "Transactions data found"
+	if len(transactions) == 0 {
+		msg = "No transaciton record for this user yet."
+	}
+	//msg = ("len %d", len(transatransactions) )
+	respondJSONWithFormat(w, http.StatusOK, transactions, nil, 200, msg)
 }
 
 func CreateTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
@@ -31,7 +36,7 @@ func CreateTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusBadRequest, nil, errMsg, 400, "Bad request. Please try again.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 400, "Bad request. Please try again.")
 		return
 	}
 	defer r.Body.Close()
@@ -43,7 +48,7 @@ func CreateTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusInternalServerError, nil, errMsg, 500, "Error saving data to the database. Please try again.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 500, "Error saving data to the database. Please try again.")
 		return
 	}
 
@@ -77,7 +82,7 @@ func UpdateTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusBadRequest, nil, errMsg, 400, "Bad request. Please try again.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 400, "Bad request. Please try again.")
 		return
 	}
 	defer r.Body.Close()
@@ -86,7 +91,7 @@ func UpdateTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusInternalServerError, nil, errMsg, 500, "Error saving data. Please try again.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 500, "Error saving data. Please try again.")
 
 		return
 	}
@@ -106,12 +111,12 @@ func DeleteTransaction(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusInternalServerError, nil, errMsg, 500, "Error deleting data in the database. Please try again.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 500, "Error deleting data in the database. Please try again.")
 
 		return
 	}
 
-	respondJSONWithFormat(w, http.StatusNoContent, nil, nil, 204, "Deleted transaciton successfully.")
+	respondJSONWithFormat(w, http.StatusOK, nil, nil, 204, "Deleted transaciton successfully.")
 }
 
 // getEmployeeOr404 gets a employee instance if exists, or respond the 404 error otherwise
@@ -121,7 +126,7 @@ func getTransactionOr404(db *gorm.DB, uuid string, w http.ResponseWriter, r *htt
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusNotFound, nil, errMsg, 404, "Transaction data not found.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 404, "Transaction data not found.")
 		return nil
 	}
 	return &transaction

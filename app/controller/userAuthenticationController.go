@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -32,7 +33,7 @@ func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusBadRequest, nil, errMsg, 400, "Bad Request. Please check and try again.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 400, "Bad Request. Please check and try again.")
 		return
 	}
 	defer r.Body.Close()
@@ -52,11 +53,33 @@ func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		//check if the current account is logged in yet?
 		if user.IsLogin && deviceId != user.DeviceId {
 			errMsg := &models.ErrorResponse{}
-			errMsg.Message = err.Error()
+			errMsg.Message = "This account has been logged in with another device. Please log out from other device first and try again."
 
-			respondJSONWithFormat(w, http.StatusUnauthorized, nil, errMsg, 400, "You have loggined this account in other account. Please log out from the other device first and try again.")
+			respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 400, "You have loggined this account in other account. Please log out from the other device first and try again.")
 
 			return
+		}
+
+		//is verified or not
+		if !user.IsVerified {
+			errMsg := &models.ErrorResponse{}
+			errMsg.Message = "This account is not verified yet. Please check your email and verify."
+
+			respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 400, "This account is verified yet. Please check your email and verify.")
+
+			return
+
+		}
+
+		//is active or not
+		if !user.IsActive {
+			errMsg := &models.ErrorResponse{}
+			errMsg.Message = "This account is not active anymore. Please contact the support to reactivate your account."
+
+			respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 400, "This account is not active anymore. Please contact the support to reactivate your account.")
+
+			return
+
 		}
 
 		//login successs, generate token
@@ -64,7 +87,7 @@ func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			errMsg := &models.ErrorResponse{}
 			errMsg.Message = err.Error()
-			respondJSONWithFormat(w, http.StatusInternalServerError, nil, errMsg, 500, "Error generating token. Please try again.")
+			respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 500, "Error generating token. Please try again.")
 
 			return
 		}
@@ -80,22 +103,24 @@ func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		user.AppId = appId
 		user.AppVersion = appVersion
 
+		fmt.Sprintf("Variable string %s content", user.OSVersion)
+
 		//update user data in the db
 		if err := db.Save(&user).Error; err != nil {
 			errMsg := &models.ErrorResponse{}
 			errMsg.Message = err.Error()
-			respondJSONWithFormat(w, http.StatusInternalServerError, nil, errMsg, 500, "Error saving useer data. Please try again.")
+			respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 500, "Error saving useer data. Please try again.")
 			return
 		}
 
 	} else {
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = "Username or Password incorrect."
-		respondJSONWithFormat(w, http.StatusUnauthorized, nil, errMsg, 400, "Unauthorized.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 400, "Unauthorized.")
 		return
 	}
 
-	respondJSONWithFormat(w, http.StatusOK, user, nil, 200, "Login successfully")
+	respondJSONWithFormat(w, http.StatusOK, user, nil, 200, "Login successfully. ")
 
 }
 
@@ -110,7 +135,7 @@ func SignUp(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusBadRequest, nil, errMsg, 400, "Bad User Input. Please check and try again.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 400, "Bad User Input. Please check and try again.")
 
 		return
 	}
@@ -126,7 +151,7 @@ func SignUp(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusInternalServerError, nil, errMsg, 500, "Internal Server Error. Please try again.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 500, "Internal Server Error. Please try again.")
 
 		return
 	}
@@ -158,7 +183,7 @@ func UpdateUserDataAfterLogout(db *gorm.DB, user *model.User, w http.ResponseWri
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusInternalServerError, nil, errMsg, 500, "500 Internal Server Error. Please try again later.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 500, "500 Internal Server Error. Please try again later.")
 
 		return
 	}
@@ -183,7 +208,7 @@ func UpdateUser(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusBadRequest, nil, errMsg, 400, "Bad request. Please try again.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 400, "Bad request. Please try again.")
 
 		return
 	}
@@ -193,7 +218,7 @@ func UpdateUser(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusInternalServerError, nil, errMsg, 500, "Error updating data. Please try agin.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 500, "Error updating data. Please try agin.")
 
 		return
 	}
@@ -209,7 +234,7 @@ func GetUserOr404(db *gorm.DB, email string, w http.ResponseWriter, r *http.Requ
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusNotFound, nil, errMsg, 404, "There is no such user in our system. Please check your credentials and try again.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 404, "There is no such user in our system. Please check your credentials and try again.")
 		return nil
 	}
 	return &user
@@ -221,7 +246,7 @@ func GetUserByUUIDOr404(db *gorm.DB, uuid string, w http.ResponseWriter, r *http
 		errMsg := &models.ErrorResponse{}
 		errMsg.Message = err.Error()
 
-		respondJSONWithFormat(w, http.StatusNotFound, nil, errMsg, 404, "There is no such user in our system. Please check your credentials and try again.")
+		respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 404, "There is no such user in our system. Please check your credentials and try again.")
 
 		return nil
 	}
