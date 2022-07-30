@@ -16,9 +16,9 @@ func GetAllFeedbacks(db *gorm.DB, w http.ResponseWriter) {
 
 	db.Order("created_at desc").Find(&feedbacks)
 
-	msg := "Feedback data found"
+	msg := "Feedback data found."
 	if len(feedbacks) == 0 {
-		msg = "No feedback foun."
+		msg = "No feedback found."
 	}
 	//msg = ("len %d", len(transatransactions) )
 	respondJSONWithFormat(w, http.StatusOK, feedbacks, nil, 200, msg)

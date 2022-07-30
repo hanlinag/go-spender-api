@@ -10,6 +10,5 @@ type Feedback struct {
 	Name    string `json:"name"`
 	Rating  string `json:"rating"`
 	Message string `json:"message"`
-	Date    string `json:"date"`
 	UserId  string `json:"user_id"`
 }
