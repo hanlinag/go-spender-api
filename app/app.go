@@ -2,19 +2,18 @@ package app
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
-	"html/template"
 
 	"github.com/gorilla/mux"
 	"gorm.io/driver/postgres"
-  	"gorm.io/gorm"
+	"gorm.io/gorm"
 
+	auth "spender/v1/app/auth"
 	controller "spender/v1/app/controller"
 	models "spender/v1/app/models"
 	configs "spender/v1/config"
-	auth "spender/v1/app/auth"
-
 )
 
 // App has router and db instances
@@ -26,16 +25,15 @@ type App struct {
 // App initialize with predefined configuration
 func (a *App) Initialize(config *configs.Config) {
 
-
 	var dbURI = ""
 
 	if configs.ISLOCAL {
 		dbURI = fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable Timezone=Asia/Rangoon",
-		config.DB.Host,
-		config.DB.Username,
-		config.DB.Password,
-		config.DB.Name,
-		config.DB.Port)
+			config.DB.Host,
+			config.DB.Username,
+			config.DB.Password,
+			config.DB.Name,
+			config.DB.Port)
 	} else {
 		dbURI = configs.DBURL
 	}
@@ -44,9 +42,9 @@ func (a *App) Initialize(config *configs.Config) {
 
 	//db, err := gorm.Open(config.DB.Dialect, dbURI)
 	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN: dbURI, 
+		DSN:                  dbURI,
 		PreferSimpleProtocol: true, // disables implicit prepared statement usage. By default pgx automatically uses the extended protocol
-	  }), &gorm.Config{})
+	}), &gorm.Config{})
 
 	if err != nil {
 		log.Fatal("Could not connect database")
@@ -80,6 +78,9 @@ func (a *App) setRouters() {
 	//transactions
 	a.Get("/api/v1/transactions", a.GetAllTransactions)
 	a.Post("/api/v1/transaction", a.CreateTransaction)
+	a.Get("/api/v1/transaction/{uuid}", a.GetSingleTransaction)
+	a.Post("/api/v1/transaction/{uuid}", a.UpdateTransaction)
+	a.Delete("/api/v1/transaction/{uuid}", a.DeleteTransaction)
 }
 
 // Wrap the router for GET method
@@ -91,9 +92,9 @@ func (a *App) Get(path string, f func(w http.ResponseWriter, r *http.Request)) {
 
 // Wrap the router for POST method
 func (a *App) Post(path string, f func(w http.ResponseWriter, r *http.Request)) {
-	
+
 	a.Router.HandleFunc(path, auth.CheckAuth(a.DB, f)).Methods("POST")
-	
+
 }
 
 // Wrap the router for PUT method
@@ -112,10 +113,10 @@ func (a *App) GetAppConfig(w http.ResponseWriter, r *http.Request) {
 	controller.GetAppConfig(a.DB, w)
 }
 
-
 func (a *App) UpdateAppConfig(w http.ResponseWriter, r *http.Request) {
 	controller.UpdateAppConfig(a.DB, w, r)
 }
+
 //--------------------------------------------
 //Auth Login
 func (a *App) AuthLogin(w http.ResponseWriter, r *http.Request) {
@@ -160,7 +161,6 @@ func (a *App) EnableEmployee(w http.ResponseWriter, r *http.Request) {
 	controller.EnableEmployee(a.DB, w, r)
 }
 
-
 //--------------------------------------------------
 //Transactions
 func (a *App) GetAllTransactions(w http.ResponseWriter, r *http.Request) {
@@ -171,6 +171,17 @@ func (a *App) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	controller.CreateTransaction(a.DB, w, r)
 }
 
+func (a *App) GetSingleTransaction(w http.ResponseWriter, r *http.Request) {
+	controller.GetTransaction(a.DB, w, r)
+}
+
+func (a *App) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
+	controller.UpdateTransaction(a.DB, w, r)
+}
+
+func (a *App) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
+	controller.DeleteTransaction(a.DB, w, r)
+}
 
 //------------------------------------------------
 // Run the app on it's router
@@ -182,8 +193,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	tpl.Execute(w, nil)
 }
 
-
-
 func (a *App) Run(host string) {
 	//Home Page
 	//fs := http.FileServer(http.Dir("assets"))
@@ -191,10 +200,6 @@ func (a *App) Run(host string) {
 	//a.Router.Handle("/assets/", http.FileServer(http.FS(contentStatic)))
 	//a.Router.HandleFunc("/assets/", serveAssets)
 	a.Router.HandleFunc("/", indexHandler)
-	
+
 	log.Fatal(http.ListenAndServe(host, a.Router))
 }
-
-
-
-
