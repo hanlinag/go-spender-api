@@ -64,7 +64,7 @@ func Login(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 			errMsg := &models.ErrorResponse{}
 			errMsg.Message = "This account is not verified yet. Please check your email and verify."
 
-			respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 400, "This account is verified yet. Please check your email and verify.")
+			respondJSONWithFormat(w, http.StatusOK, nil, errMsg, 400, "This account is not verified yet. Please check your email and verify.")
 
 			return
 
