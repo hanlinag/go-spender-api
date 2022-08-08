@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"gorm.io/driver/postgres"
@@ -35,7 +36,8 @@ func (a *App) Initialize(config *configs.Config) {
 			config.DB.Name,
 			config.DB.Port)
 	} else {
-		dbURI = configs.DBURL
+		//dbURI = configs.DBURL
+		dbURI = os.Getenv("DATABASE_URL")
 	}
 
 	fmt.Println(dbURI)
